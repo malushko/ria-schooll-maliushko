@@ -6,6 +6,43 @@
  */
 
 module.exports = function () {
+
+    /**
+     *
+     * Add new User!!!!
+     *
+     *
+     */
+
+
+    /**
+     *
+     * @param url /users
+     * @param data write user
+     * @returns {Promise}
+     */
+    function addOnDbNewUser(url, data) {
+        return new Promise(function (resolve, reject) {
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onload = function () {
+                if(this.status > 250){
+                    let error = new Error(this.statusText);
+                    error.code = this.status;
+                    reject(error);
+                }else{
+                    let responseFromDb = this.statusText;
+                    resolve(responseFromDb);
+                }
+            };
+            xhr.send(JSON.stringify({name: data}));
+        })
+    }
+
+    /**
+     * after user add "ДОБАВИТЬ"
+     */
     function addNewElement() {
         let usserId = document.getElementsByClassName("tbody-user")[0].lastElementChild;
         let data = document.getElementById('name').value;
@@ -26,24 +63,19 @@ module.exports = function () {
 //
 // POST REQUEST
 //
-        let xhr = new XMLHttpRequest();
-        xhr.open('POST', '/users', true);
-        data = JSON.stringify({name: data});
-        alert(data);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(data);
-        xhr.onreadystatechange = function () {
-            if (this.readyState != 4) return;
-            if (this.status != 200) {
-                alert(this.status ? this.statusText : 'The request fails!!!');
-            }
-        }
+        addOnDbNewUser('/users', data)
+            .then(
+                 responseFromDb => console.log(responseFromDb),
+                 error => {
+                     let tr = document.createElement('tr');
+                     tr.innerHTML = `<h2>${error}</h2>`;
+                });
     }
 
     // even add new user
     addUser.addEventListener("click", addNewElement);
 
-}
+};
 
 
 
